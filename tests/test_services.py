@@ -81,7 +81,7 @@ def test_analyst_uses_openrouter_and_validates_structured_response() -> None:
         assert request.url == OPENROUTER_URL
         assert request.headers["Authorization"] == "Bearer test-secret"
         payload = json.loads(request.content)
-        assert payload["model"] == "openai/gpt-4o-mini"
+        assert payload["model"] == "google/gemma-4-31b-it:free"
         assert payload["messages"][1]["content"] == "What matters for AI?"
         return httpx.Response(
             200,

@@ -4,13 +4,21 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from components.layout import page_heading
-from services.demo_data import TREND_RADAR
+from services.demo_data import TREND_RADAR as SAMPLE_RADAR
+from services.feeds import topic_momentum
+from services.live import get_signals
 
 
 def render() -> None:
     """Render the radar chart and category strength table."""
     page_heading("MARKET MOMENTUM", "Trend Radar", "Compare signal intensity across the markets you follow.")
-    st.caption("Illustrative sample scores. A production radar should be derived from source volume, growth, and confidence.")
+    signals, is_live, _ = get_signals()
+    TREND_RADAR = topic_momentum(signals) if is_live else SAMPLE_RADAR
+    if len(TREND_RADAR) < 3:
+        TREND_RADAR = SAMPLE_RADAR
+        is_live = False
+    st.caption("Live momentum = 50% story volume + 50% average signal score per topic, from today's feeds. Follow more topics in Settings to widen the radar."
+               if is_live else "Illustrative sample scores (live feeds unavailable or too few topics followed).")
     categories = list(TREND_RADAR)
     values = list(TREND_RADAR.values())
     figure = go.Figure(

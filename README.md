@@ -45,13 +45,29 @@ DOST_ALPHA/
 └── requirements.txt
 ```
 
-DOST ALPHA turns source material into ranked, evidence-led intelligence. This workspace is the first runnable Streamlit prototype: it includes an interactive premium-style dashboard and sample signals, with every simulated metric and response explicitly labeled. The AI Analyst can call OpenRouter when configured, but has no retrieval or live-source connection. Live ingestion, user authentication, and payment processing are not implemented.
+DOST ALPHA turns public news into ranked, evidence-led intelligence, using only free services.
 
-## OpenRouter key
+## What is live (no wire account, no paid API)
 
-The AI Analyst reads `OPENROUTER_API_KEY` from the environment or `.streamlit/secrets.toml`. A local secrets file is ignored by `.gitignore`; never commit it or paste keys into source code. The configured Analyst uses OpenRouter's chat-completions API with `openai/gpt-4o-mini` and returns validated structured JSON. If no key is configured, the clearly labeled sample Analyst remains available. Provider failures are shown to the user rather than replaced with sample output.
+- **Intelligence Feed:** pulls free public RSS/Atom feeds (Google News topic searches, TechCrunch, The Verge, Hacker News, Ars Technica, Search Engine Journal, Search Engine Roundtable, Google Search Central, Krebs, The Hacker News). Sources live in `services/feeds.py` → `SOURCES`; add any RSS URL there. Results are cached for 20 minutes. Scores are transparent heuristics: source quality, recency, high-impact entities and cross-source corroboration.
+- **AI Analyst:** finds the live headlines most relevant to the question and sends them to a **free OpenRouter model**, which must cite them. Sources read are listed under each answer.
+- **Executive Briefings:** AI-written brief from today's headlines with a numbered source list; Markdown, HTML and PDF downloads. Without a key it falls back to an extractive brief built from the real headlines.
+- **Overview / Trend Radar:** metrics and topic momentum computed from the live feed.
+- **Subscription:** free beta, no checkout. Optional `PAYMENT_LINK_PRO`, `PAYMENT_LINK_ALPHA` (any hosted link: Payoneer, Gumroad, Lemon Squeezy) and `CONTACT_EMAIL` secrets turn the buttons into payment or waitlist links.
 
-The model is not connected to retrieval or live news in this prototype, and it does not provide source citations. Treat generated analysis as unverified and check primary sources.
+If feeds are unreachable the app shows clearly labeled sample data instead of failing.
+
+## Secrets (Streamlit Cloud → App → Settings → Secrets, or `.streamlit/secrets.toml` locally)
+
+```toml
+OPENROUTER_API_KEY = "sk-or-..."        # free key from openrouter.ai/keys
+# optional
+# OPENROUTER_MODEL = "google/gemma-4-31b-it:free,openrouter/free"
+# CONTACT_EMAIL = "you@example.com"
+# PAYMENT_LINK_PRO = "https://..."
+```
+
+Default models are free (`google/gemma-4-31b-it:free`, then `openrouter/free`, Nemotron and Qwen as fallbacks when one is rate-limited). Never commit the secrets file.
 
 ## Run locally
 

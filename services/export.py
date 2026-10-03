@@ -11,7 +11,15 @@ from reportlab.lib.units import inch
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 
-def render_brief_pdf(title: str, markdown: str) -> bytes:
+def _inline(text: str) -> str:
+    """Escape text for ReportLab and turn bare URLs into clickable links."""
+    import re
+
+    safe = escape(text.replace("**", ""))
+    return re.sub(r"(https?://[^\s<]+)", r'<link href="\1" color="#5336A5">\1</link>', safe)
+
+
+def render_brief_pdf(title: str, markdown: str, footer: str = "DOST ALPHA  |  Illustrative sample briefing") -> bytes:
     """Render a printable executive briefing PDF."""
     buffer = BytesIO()
     document = SimpleDocTemplate(
@@ -59,15 +67,15 @@ def render_brief_pdf(title: str, markdown: str) -> bytes:
         stripped = line.strip()
         if not stripped:
             story.append(Spacer(1, 3))
-        elif stripped.startswith("### "):
-            story.append(Paragraph(escape(stripped[4:]), heading_style))
-        elif stripped.startswith("- "):
-            story.append(Paragraph(f"&bull;&nbsp; {escape(stripped[2:])}", body_style))
+        elif stripped.startswith("#"):
+            story.append(Paragraph(_inline(stripped.lstrip("#").strip()), heading_style))
+        elif stripped.startswith(("- ", "* ")):
+            story.append(Paragraph(f"&bull;&nbsp; {_inline(stripped[2:])}", body_style))
         elif stripped[:1].isdigit() and ". " in stripped[:4]:
             item = stripped.split(". ", 1)[1]
-            story.append(Paragraph(f"&bull;&nbsp; {escape(item)}", body_style))
+            story.append(Paragraph(f"&bull;&nbsp; {_inline(item)}", body_style))
         else:
-            story.append(Paragraph(escape(stripped), body_style))
+            story.append(Paragraph(_inline(stripped), body_style))
 
     def draw_footer(canvas, _document) -> None:
         canvas.saveState()
@@ -75,7 +83,7 @@ def render_brief_pdf(title: str, markdown: str) -> bytes:
         canvas.line(0.75 * inch, 0.55 * inch, 7.75 * inch, 0.55 * inch)
         canvas.setFillColor(colors.HexColor("#768198"))
         canvas.setFont("Helvetica", 8)
-        canvas.drawString(0.75 * inch, 0.38 * inch, "DOST ALPHA  |  Illustrative sample briefing")
+        canvas.drawString(0.75 * inch, 0.38 * inch, footer)
         canvas.drawRightString(7.75 * inch, 0.38 * inch, str(canvas.getPageNumber()))
         canvas.restoreState()
 

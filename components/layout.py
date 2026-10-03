@@ -43,7 +43,7 @@ def render_sidebar() -> str:
         )
         st.markdown(
             '<div class="sidebar-workspace"><span class="live-dot"></span>'
-            '<span>DEMO WORKSPACE</span><span class="workspace-plan">ALPHA</span></div>',
+            '<span>LIVE WORKSPACE</span><span class="workspace-plan">BETA</span></div>',
             unsafe_allow_html=True,
         )
         st.markdown(
