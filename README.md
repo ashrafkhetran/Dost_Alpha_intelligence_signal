@@ -3,6 +3,9 @@
 **AI Intelligence Terminal**  
 *Signal Over Noise. Intelligence Over Information.*
 
+Product, architecture, security, deployment, and implementation documentation:
+[docs/README.md](docs/README.md).
+
 ## Project tree
 
 ```text
