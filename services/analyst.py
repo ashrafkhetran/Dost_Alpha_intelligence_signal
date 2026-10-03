@@ -138,7 +138,7 @@ def _chat(
     for model in models or configured_models():
         payload = {"model": model, "temperature": 0.2, "max_tokens": max_tokens, "messages": messages}
         try:
-            with httpx.Client(timeout=httpx.Timeout(60.0, connect=10.0), transport=transport) as client:
+            with httpx.Client(timeout=httpx.Timeout(35.0, connect=8.0), transport=transport) as client:
                 response = client.post(
                     OPENROUTER_URL,
                     headers={
